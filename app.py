@@ -466,3 +466,11 @@ if st.session_state.models_data and "records" in st.session_state.models_data:
                         st.error(f"Error parsing YAML: {str(e)}")
                 else:
                     st.error("Failed to fetch model YAML") 
+
+
+# Add the note at the bottom
+st.markdown("""
+    <div style="text-align: center; color: #666; font-size: 0.8rem; font-style: italic;">
+        Built on <a href="https://omni.co/" style="color: #666; text-decoration: none;">Omni</a> and vibes ✨
+    </div>
+""", unsafe_allow_html=True)
