@@ -366,7 +366,7 @@ except ValueError as e:
     st.error(str(e))
     st.stop()
 
-st.title("📚 Omni Catalog")
+st.title("🔍 Omni Model Browser")
 
 # Initialize session state for models data
 if 'models_data' not in st.session_state:
