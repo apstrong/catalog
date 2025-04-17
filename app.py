@@ -208,25 +208,18 @@ def display_file_content(selected_file: str, file_content: str, all_files: dict 
         except Exception:
             base_table = selected_file.replace('.topic', '')
         
-        # First row: YAML and Join Tree side by side
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            st.subheader("YAML View")
-            st.code(file_content, language="yaml")
-            
-        with col2:
-            st.subheader("Join Tree")
-            try:
-                topic_data = yaml.safe_load(file_content)
-                if isinstance(topic_data, dict) and 'joins' in topic_data:
-                    # Create and display graph
-                    graph = create_join_graph(topic_data, base_table)
-                    st.graphviz_chart(graph)
-                else:
-                    st.info("No join relationships found in this file")
-            except Exception as e:
-                st.error(f"Error creating join tree: {str(e)}")
+        # First row: Join Tree
+        st.subheader("Join Tree")
+        try:
+            topic_data = yaml.safe_load(file_content)
+            if isinstance(topic_data, dict) and 'joins' in topic_data:
+                # Create and display graph
+                graph = create_join_graph(topic_data, base_table)
+                st.graphviz_chart(graph)
+            else:
+                st.info("No join relationships found in this file")
+        except Exception as e:
+            st.error(f"Error creating join tree: {str(e)}")
         
         # Second row: Fields table (full width)
         try:
@@ -238,6 +231,8 @@ def display_file_content(selected_file: str, file_content: str, all_files: dict 
                         # Create DataFrame for the table
                         import pandas as pd
                         df = pd.DataFrame(all_fields)
+                        
+                        st.subheader("Fields")
                         
                         # Add filters
                         col1, col2 = st.columns(2)
@@ -289,6 +284,10 @@ def display_file_content(selected_file: str, file_content: str, all_files: dict 
                         st.info("No fields found in any of the views")
         except Exception as e:
             st.error(f"Error creating fields table: {str(e)}")
+            
+        # Add collapsible YAML view at the bottom
+        with st.expander("View YAML", expanded=False):
+            st.code(file_content, language="yaml")
             
     elif selected_file.endswith('.view'):
         try:
@@ -343,9 +342,9 @@ def display_file_content(selected_file: str, file_content: str, all_files: dict 
                 else:
                     st.info("No fields found in this view")
                 
-                # Show YAML view underneath
-                st.subheader("YAML View")
-                st.code(file_content, language="yaml")
+                # Show YAML view in collapsible section
+                with st.expander("View YAML", expanded=False):
+                    st.code(file_content, language="yaml")
             
         except Exception as e:
             st.error(f"Error creating field table: {str(e)}")
@@ -419,21 +418,9 @@ if st.session_state.models_data and "records" in st.session_state.models_data:
                                 relationship_file = next((f for f in file_names if 'relationship' in f.lower()), None)
                                 
                                 # Create tabs for different file types
-                                tab1, tab2, tab3, tab4 = st.tabs(["Model", "Relationships", "Topics", "Views"])
+                                tab1, tab2, tab3, tab4 = st.tabs(["Topics", "Views", "Model", "Relationships"])
                                 
                                 with tab1:
-                                    if model_file:
-                                        display_file_content(model_file, yaml_data["files"][model_file])
-                                    else:
-                                        st.info("No model file found")
-                                        
-                                with tab2:
-                                    if relationship_file:
-                                        display_file_content(relationship_file, yaml_data["files"][relationship_file])
-                                    else:
-                                        st.info("No relationship file found")
-                                        
-                                with tab3:
                                     if topics:
                                         selected_topic = st.selectbox(
                                             "Select a topic file",
@@ -446,7 +433,7 @@ if st.session_state.models_data and "records" in st.session_state.models_data:
                                     else:
                                         st.info("No topic files found")
                                         
-                                with tab4:
+                                with tab2:
                                     if views:
                                         selected_view = st.selectbox(
                                             "Select a view file",
@@ -458,6 +445,18 @@ if st.session_state.models_data and "records" in st.session_state.models_data:
                                             display_file_content(selected_view, yaml_data["files"][selected_view])
                                     else:
                                         st.info("No view files found")
+                                        
+                                with tab3:
+                                    if model_file:
+                                        display_file_content(model_file, yaml_data["files"][model_file])
+                                    else:
+                                        st.info("No model file found")
+                                        
+                                with tab4:
+                                    if relationship_file:
+                                        display_file_content(relationship_file, yaml_data["files"][relationship_file])
+                                    else:
+                                        st.info("No relationship file found")
                             else:
                                 st.info("No files found in the model YAML")
                         else:
