@@ -39,4 +39,5 @@ ENV/
 Thumbs.db
 
 # Streamlit
-.streamlit/ 
+.streamlit/secrets.toml
+.streamlit/credentials.toml 
