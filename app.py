@@ -205,6 +205,11 @@ def display_file_content(selected_file: str, file_content: str, all_files: dict 
                 base_table = topic_data['base_view']
             else:
                 base_table = selected_file.replace('.topic', '')
+                
+            # Display description if available
+            if isinstance(topic_data, dict) and 'description' in topic_data:
+                st.info(topic_data['description'])
+                
         except Exception:
             base_table = selected_file.replace('.topic', '')
         
